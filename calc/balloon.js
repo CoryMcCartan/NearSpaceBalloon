@@ -17,9 +17,9 @@ const G = 6.674e-11;
 const C_D = 0.3 // sphere coeff. of drag
 
 // balloon characteristics
-const m_empty = 0.8;
+const m_empty = 0.8; // kg
 const r_burst = 3.505;
-const m_payload = 0.6;
+const m_payload = 0.9; // kg
 const beta = 0.02; // extra pressure on inside of balloon due to stretchiness of latex
 
 // gas molar masses
@@ -44,7 +44,7 @@ const base_h = 0;
  * Main routine, program entry point
  */
 function main() {
-	for (var V = 0.5; V < 2.0; V += 0.1) {
+	for (var V = 0.5; V < 2.5; V += 0.1) {
 		var string =  "";
 		string += `V = ${V.toFixed(4)},  \t`;
         string += `v = ${getVelocity(V, base_h).toFixed(3)},  \t`;
