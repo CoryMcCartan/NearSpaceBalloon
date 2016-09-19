@@ -47,14 +47,13 @@ void setup() {
 
 void loop() {
     Location position = getGPSData();
-    Serial.print("LAT. = ");
-    Serial.print(position.latitude / 3e5);
-    Serial.print(" LONG. = ");
-    Serial.print(position.longitude / 3e5);
-    Serial.print(" ALT. = ");
-    Serial.print(position.altitude);
-    Serial.print("\r");
-    delay(1000);
+    // Serial.print("LAT. = ");
+    // Serial.print(position.latitude);
+    // Serial.print(" LONG. = ");
+    // Serial.print(position.longitude);
+    // Serial.print(" ALT. = ");
+    // Serial.println(position.altitude);
+    delay(2000);
 }
 
 void end() { while (true) delay(1000); }

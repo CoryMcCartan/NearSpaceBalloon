@@ -30,7 +30,7 @@ bool setupGPS() {
     digitalWrite(ENABLE_GPS, HIGH);
     delay(500);
 
-    bool success = true;//  setDynamicModel(); 
+    bool success = setDynamicModel(); 
 
     Serial.println(success ? "Setup complete." : "Setup failed.");
 
@@ -41,6 +41,9 @@ Location getGPSData() {
     while (gps_serial.available()) {
         byte b = gps_serial.read();
 
+        Serial.write(b);
+        continue;
+
         if (!gps.encode(b)) continue; // wait for valid data
 
         Location position;
@@ -48,6 +51,18 @@ Location getGPSData() {
 
         gps.get_position(&position.latitude, &position.longitude, &fix_age);
         position.altitude = gps.altitude();
+
+        unsigned long chars;
+        unsigned short sentences, failed_chks;
+
+        gps.stats(&chars, &sentences, &failed_chks);
+        Serial.println(chars);
+        Serial.println(sentences);
+        Serial.println();
+
+        if (fix_age == TinyGPS::GPS_INVALID_AGE) {
+            Serial.println("No fix.");
+        }
 
         return position;
     }
