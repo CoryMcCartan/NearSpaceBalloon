@@ -17,25 +17,25 @@ bool setupTemperatureSensor() {
     return true;
 }
 
-double getTemperature() {
+float getTemperature() {
     Wire.requestFrom(TMP102_ADDRESS, 2);  // 2 is number of bytes requested
 
     byte MSB = Wire.read();
     byte LSB = Wire.read();
 
     //it's a 12-bit int, using two's complement for negative
-    int temperatureSum = ((MSB << 8) | LSB) >> 4; 
+    short temperatureSum = ((MSB << 8) | LSB) >> 4; 
 
-    double celsius = temperatureSum * 0.0625;
-    double kelvin = celsius + K_OFFSET;
+    float celsius = temperatureSum * 0.0625;
+    float kelvin = celsius + K_OFFSET;
 
     return kelvin;
 }
 
-double toCelsius(double kelvin) {
+float toCelsius(float kelvin) {
     return kelvin - K_OFFSET;
 }
 
-double toFarenheit(double kelvin) {
+float toFarenheit(float kelvin) {
     return (kelvin - K_OFFSET) * 1.8 + 32;
 }

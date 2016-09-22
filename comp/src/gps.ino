@@ -9,70 +9,139 @@
 
 #include "gps.h"
 #include <SoftwareSerial.h>
-#include <TinyGPS.h>
 
-#define ENABLE_GPS 2
+#define ENABLE_GPS 12
 
-TinyGPS gps;
+// parsing cases
+#define LAT 1
+#define LONG 3
+#define SAT 6
+#define ALT 8
+
 SoftwareSerial gps_serial(4, 5); // RX, TX
 
-bool setDynamicModel();
-void sendUBX(byte* message, byte length);
-bool getUBX_ACK(byte* message);
+byte index = 0;
+byte buffer[82];
 
 bool setupGPS() {
     pinMode(ENABLE_GPS, OUTPUT);
 
-    Serial.begin(9600);
     gps_serial.begin(9600);
-    delay(500);
+    delay(100);
 
     digitalWrite(ENABLE_GPS, HIGH);
-    delay(500);
+    delay(400);
 
-    bool success = setDynamicModel(); 
-
-    Serial.println(success ? "Setup complete." : "Setup failed.");
-
-    return success;
+    return setDynamicModel(); 
 }
 
-Location getGPSData() {
+void getGPSData(Location * position) {
+    bool newData = false;
+
     while (gps_serial.available()) {
-        byte b = gps_serial.read();
+        char c = gps_serial.read();
 
-        Serial.write(b);
-        continue;
+        if ((c == '$') || (index >= 80)) // start of new line
+            index = 0;
 
-        if (!gps.encode(b)) continue; // wait for valid data
+        if (c != '\r')  // store every character in buffer
+            buffer[index++] = c;
 
-        Location position;
-        unsigned long fix_age;
+        if (c == '\n') {
+            // $GNGGA is a position string
+            if ((buffer[1] == 'G') && (buffer[3] == 'G') && (buffer[4] == 'G') && (buffer[5] == 'A'))
+                processGNGGA(position);
 
-        gps.get_position(&position.latitude, &position.longitude, &fix_age);
-        position.altitude = gps.altitude();
-
-        unsigned long chars;
-        unsigned short sentences, failed_chks;
-
-        gps.stats(&chars, &sentences, &failed_chks);
-        Serial.println(chars);
-        Serial.println(sentences);
-        Serial.println();
-
-        if (fix_age == TinyGPS::GPS_INVALID_AGE) {
-            Serial.println("No fix.");
+            index = 0;
         }
-
-        return position;
     }
 }
+
+/**
+ * Parse NMEA GNGGA string for coordinates and # of satellites in view
+ */
+void processGNGGA(Location * position) {
+    bool intPart = true;
+    float altitude = 0;
+    float lat_min = 0;
+    float lon_min = 0;
+    byte lat_deg = 0;
+    byte lon_deg = 0;
+    byte satellites = 0;
+
+    // iterate over string (starting at char 7 after $GNGGA) char-by-char
+    byte i, j, k;
+    for (i = 7, j = 0, k = 0; i < index && j < 9; i++) {
+        char c = buffer[i];
+        // new segment
+        if (c == ',') {
+            j++;
+            k = 0;
+            intPart = true;
+            continue;
+        }
+
+        switch (j) {
+            case LAT:
+                if (k < 2)
+                    parseInt(&lat_deg, c);
+                else 
+                    parseFloat(&lat_min, c, &intPart);
+                break;
+            case LONG:
+                if (k < 3)
+                    parseInt(&lon_deg, c);
+                else 
+                    parseFloat(&lon_min, c, &intPart);
+                break;
+            case SAT:
+                parseInt(&satellites, c);
+                break;
+            case ALT:
+                parseFloat(&altitude, c, &intPart);
+                break;
+        }
+
+        k++;
+    }
+
+    position->altitude = altitude;
+    position->latitude = ((float) lat_deg) + lat_min / 60.0;
+    position->longitude = ((float) lon_deg) + lon_min / 60.0;
+}
+
+/**
+ * Parse a character into an existing integer.
+ */
+void parseInt(byte * val, char c) {
+    if (c >= '0' && c <= '9') {
+        *val *= 10;
+        *val += (byte) (c - '0');
+    }
+}
+
+/**
+ * Parse a character into an existing floating-point number.
+ */
+void parseFloat(float * val, char c, bool * intPart) {
+    if (c >= '0' && c <= '9' && *intPart) {
+        *val *= 10;
+        *val += (float) (c - '0');
+    } else {
+        *intPart = false;
+
+        *val *= 10;
+        *val += ((float) (c - '0'));
+        *val /= 10;
+    }
+}
+
 
 /**
  * Set the dynamic model the GPS should use, which is airborne.  Allows for 
  * operation above 12km, and full 3D positioning.
  */
-bool setDynamicModel() {
+bool setDynamicModel()  {
     bool gps_success = false;
 
     byte dynamic_model_command[] = {
@@ -84,7 +153,7 @@ bool setDynamicModel() {
     };
     byte command_length = sizeof(dynamic_model_command) / sizeof(byte);
 
-    for (int i = 0; i < 5; i++) { // try at most five times
+    for (byte i = 0; i < 5; i++) { // try at most five times
         sendUBX(dynamic_model_command, command_length);
         if (getUBX_ACK(dynamic_model_command)) {
             return true;
@@ -101,7 +170,7 @@ void sendUBX(byte* message, byte length) {
     gps_serial.flush();
     gps_serial.write(0xFF);
     delay(500);
-    for (int i = 0; i < length; i++) {
+    for (byte i = 0; i < length; i++) {
         gps_serial.write(message[i]);
     }
 }

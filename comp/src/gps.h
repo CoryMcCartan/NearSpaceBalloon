@@ -11,18 +11,21 @@
 #define GPS_H_
 
 typedef struct {
-    long latitude;
-    long longitude;
-    long altitude;
+    float latitude;
+    float longitude;
+    float altitude;
 } Location;
 
 /**
- * Set up GPS sensor. Return
+ * Set up GPS sensor. 
  * 
  * @return true if successful, false otherwise.
  */
 bool setupGPS();
 
-Location getGPSData();
+/**
+ * Get current GPS coordinates and store them in given Location struct.
+ */
+void getGPSData(Location * position);
 
 #endif // GPS_H_

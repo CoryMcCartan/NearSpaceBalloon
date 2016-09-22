@@ -19,7 +19,7 @@ bool setupPressureSensor() {
     }
 }
 
-double getPressure() {
+float getPressure() {
     char status;
     double temperature, pressure;
 
@@ -48,5 +48,5 @@ double getPressure() {
         } else pressure = -1; // error value
     } else pressure = -1; // error value
 
-    return pressure;
+    return (float) pressure;
 }

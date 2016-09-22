@@ -25,6 +25,6 @@ bool setupPressureSensor();
  *
  * @return current pressure, in millibars.
  */
-double getPressure();
+float getPressure();
 
 #endif // PRESSURE_H_

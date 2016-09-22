@@ -24,7 +24,7 @@ bool setupTemperatureSensor();
  *
  * @return current temperature, in Kelvins.
  */
-double getTemperature();
+float getTemperature();
 
 /**
  * Converts temperature in Kelvin to Celsius.
@@ -32,7 +32,7 @@ double getTemperature();
  * @param kelvin a temperature in Kelvin
  * @return the temperature in Celsius.
  */
-double toCelsius(double kelvin);
+float toCelsius(float kelvin);
 
 /**
  * Converts temperature in Kelvin to Farenheit.
@@ -40,6 +40,6 @@ double toCelsius(double kelvin);
  * @param kelvin a temperature in Kelvin
  * @return the temperature in Farenheit.
  */
-double toFarenheit(double kelvin);
+float toFarenheit(float kelvin);
 
 #endif // TEMP_H_
