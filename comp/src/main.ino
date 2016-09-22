@@ -13,7 +13,7 @@
 
 #define INTERVAL 2000
 
-Location position;
+ProbeInfo info;
 unsigned long previous = 0;
 
 // runs once at start
@@ -27,7 +27,7 @@ void setup() {
 
 // runs continuously
 void loop() {
-    getGPSData(&position);
+    getGPSData(&info);
 
     unsigned long current = millis();
     if (current - previous >= INTERVAL) {
@@ -45,12 +45,16 @@ void loop() {
         Serial.print(" mb  ");
 
         Serial.print("LAT. = ");
-        Serial.print(position.latitude);
+        Serial.print(info.latitude);
         Serial.print("°  LONG. = ");
-        Serial.print(position.longitude);
+        Serial.print(info.longitude);
         Serial.print("°  ALT. = ");
-        Serial.print(position.altitude);
-        Serial.println(" m");
+        Serial.print(info.altitude);
+        Serial.print(" m  SPD. = ");
+        Serial.print(info.speed);
+        Serial.print(" m/s  (");
+        Serial.print(info.satellites);
+        Serial.println(" satellites )");
     }
 }
 

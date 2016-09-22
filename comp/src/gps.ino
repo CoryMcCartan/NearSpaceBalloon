@@ -35,7 +35,7 @@ bool setupGPS() {
     return setDynamicModel(LOW_ALTITUDE); 
 }
 
-void getGPSData(Location * position) {
+void getGPSData(ProbeInfo * info) {
     bool newData = false;
 
     while (gps_serial.available()) {
@@ -48,9 +48,12 @@ void getGPSData(Location * position) {
             buffer[index++] = c;
 
         if (c == '\n') {
-            // $GNGGA is a position string
+            // $GNGGA is a info string
             if ((buffer[1] == 'G') && (buffer[3] == 'G') && (buffer[4] == 'G') && (buffer[5] == 'A'))
-                processGNGGA(position);
+                processGNGGA(info);
+            // $GNVTG is a velocity string
+            if ((buffer[1] == 'G') && (buffer[3] == 'V') && (buffer[4] == 'T') && (buffer[5] == 'G'))
+                processGNVTG(info);
 
             index = 0;
         }
@@ -60,7 +63,7 @@ void getGPSData(Location * position) {
 /**
  * Parse NMEA GNGGA string for coordinates and # of satellites in view
  */
-void processGNGGA(Location * position) {
+void processGNGGA(ProbeInfo * info) {
     bool intPart = true;
     float altitude = 0;
     float lat_min = 0;
@@ -105,9 +108,37 @@ void processGNGGA(Location * position) {
         k++;
     }
 
-    position->altitude = altitude;
-    position->latitude = ((float) lat_deg) + lat_min / 60.0;
-    position->longitude = ((float) lon_deg) + lon_min / 60.0;
+    info->satellites = satellites;
+    info->altitude = altitude;
+    info->latitude = ((float) lat_deg) + lat_min / 60.0;
+    info->longitude = ((float) lon_deg) + lon_min / 60.0;
+}
+
+
+/**
+ * Parse NMEA GNVTG string for ground speed of satellites
+ */
+void processGNVTG(ProbeInfo * info) {
+    bool intPart = true;
+    float speed = 0;
+
+    // iterate over string (starting at char 7 after $GNVTG) char-by-char
+    byte i, j;
+    for (i = 7, j = 0; i < index && j < 9; i++) {
+        char c = buffer[i];
+        // new segment
+        if (c == ',') {
+            j++;
+            intPart = true;
+            continue;
+        }
+
+        if (j == 7) {
+            parseFloat(&speed, c, &intPart);
+        }
+    }
+
+    info->speed = speed / 3.6; // km/h -> m/s
 }
 
 /**

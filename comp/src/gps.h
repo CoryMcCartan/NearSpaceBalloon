@@ -14,10 +14,13 @@
 #define HIGH_ALTITUDE 0x06
 
 typedef struct {
-    float latitude;
-    float longitude;
-    float altitude;
-} Location;
+    float latitude;   // decimal degrees
+    float longitude;  // decimal degrees
+    float altitude;   // meters
+    byte satellites;  
+    float speed;      // meters per second
+
+} ProbeInfo;
 
 /**
  * Set up GPS sensor. 
@@ -27,8 +30,8 @@ typedef struct {
 bool setupGPS();
 
 /**
- * Get current GPS coordinates and store them in given Location struct.
+ * Get current GPS coordinates and store them in given ProbeInfo struct.
  */
-void getGPSData(Location * position);
+void getGPSData(ProbeInfo * info);
 
 #endif // GPS_H_
