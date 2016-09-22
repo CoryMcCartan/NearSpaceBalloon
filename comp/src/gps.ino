@@ -32,7 +32,7 @@ bool setupGPS() {
     digitalWrite(ENABLE_GPS, HIGH);
     delay(400);
 
-    return setDynamicModel(); 
+    return setDynamicModel(HIGH_ALTITUDE); 
 }
 
 void getGPSData(Location * position) {
@@ -136,32 +136,34 @@ void parseFloat(float * val, char c, bool * intPart) {
     }
 }
 
-
 /**
- * Set the dynamic model the GPS should use, which is airborne.  Allows for 
- * operation above 12km, and full 3D positioning.
+ * Sets GPS dynamic model.
  */
-bool setDynamicModel()  {
-    bool gps_success = false;
-
-    byte dynamic_model_command[] = {
+bool setDynamicModel(byte mode) {
+    byte dynamic_model_command[] = { // default high altitude
         0xB5, 0x62, 0x06, 0x24, 0x24, 0x00, 0xFF, 0xFF, 0x06,
         0x03, 0x00, 0x00, 0x00, 0x00, 0x10, 0x27, 0x00, 0x00,
         0x05, 0x00, 0xFA, 0x00, 0xFA, 0x00, 0x64, 0x00, 0x2C,
         0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0xDC 
     };
-    byte command_length = sizeof(dynamic_model_command) / sizeof(byte);
+
+    if (mode == LOW_ALTITUDE) {
+        dynamic_model_command[8] = 0x03;
+        dynamic_model_command[42] = 0x2A;
+        dynamic_model_command[43] = 0xDA;
+    }
 
     for (byte i = 0; i < 5; i++) { // try at most five times
-        sendUBX(dynamic_model_command, command_length);
+        sendUBX(dynamic_model_command, 44); // 44 is length
         if (getUBX_ACK(dynamic_model_command)) {
             return true;
         }
     }
 
-    return false;
+    return false; // didn't work
 }
+
 
 /**
  * Send a command/message to the GPS unit.
