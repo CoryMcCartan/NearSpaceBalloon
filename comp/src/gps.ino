@@ -32,7 +32,7 @@ bool setupGPS() {
     digitalWrite(ENABLE_GPS, HIGH);
     delay(400);
 
-    return setDynamicModel(HIGH_ALTITUDE); 
+    return setDynamicModel(LOW_ALTITUDE); 
 }
 
 void getGPSData(Location * position) {
@@ -141,17 +141,17 @@ void parseFloat(float * val, char c, bool * intPart) {
  */
 bool setDynamicModel(byte mode) {
     byte dynamic_model_command[] = { // default high altitude
-        0xB5, 0x62, 0x06, 0x24, 0x24, 0x00, 0xFF, 0xFF, 0x06,
+        0xB5, 0x62, 0x06, 0x24, 0x24, 0x00, 0xFF, 0xFF, mode,
         0x03, 0x00, 0x00, 0x00, 0x00, 0x10, 0x27, 0x00, 0x00,
         0x05, 0x00, 0xFA, 0x00, 0xFA, 0x00, 0x64, 0x00, 0x2C,
         0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0xDC 
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
     };
 
-    if (mode == LOW_ALTITUDE) {
-        dynamic_model_command[8] = 0x03;
-        dynamic_model_command[42] = 0x2A;
-        dynamic_model_command[43] = 0xDA;
+    // calculate checksum
+    for (byte j = 2; j < 42; j++) {
+        dynamic_model_command[42] += dynamic_model_command[j];
+        dynamic_model_command[43] += dynamic_model_command[42];
     }
 
     for (byte i = 0; i < 5; i++) { // try at most five times

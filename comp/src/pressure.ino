@@ -34,7 +34,7 @@ float getPressure() {
         if (status != 0) {
             // ready to start pressure measurement.
             // param is 0-3.  higher means more accuracy, but a longer wait.
-            status = pressureSensor.startPressure(3); 
+            status = pressureSensor.startPressure(2); 
             if (status != 0) {
                 delay(status); // wait for the measurement to complete
 

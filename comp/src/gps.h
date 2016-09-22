@@ -10,8 +10,8 @@
 #ifndef GPS_H_
 #define GPS_H_
 
-#define LOW_ALTITUDE 1
-#define HIGH_ALTITUDE 2
+#define LOW_ALTITUDE 0x03
+#define HIGH_ALTITUDE 0x06
 
 typedef struct {
     float latitude;
