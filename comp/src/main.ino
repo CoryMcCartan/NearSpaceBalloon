@@ -21,9 +21,14 @@
 #define S_PRELANDING 6
 #define S_LANDING 7
 
+#define LOW_HIGH_THRESHOLD 1000
+
 ProbeInfo info;
 unsigned long previous = 0;
 
+float prevAltitude;
+float maxAltitude = 0;
+float basePressure;
 byte state = S_SETUP;
 
 // runs once at start
@@ -33,26 +38,52 @@ void setup() {
     setupGPS() || error("GPS sensor setup failed.");
     setupTemperatureSensor() || error("Temperature sensor setup failed.");
     setupPressureSensor() || error("Pressure sensor setup failed.");
-
-    state = S_PRELAUNCH;
 }
 
 // runs continuously
 void loop() {
     getGPSData(&info);
 
+
     switch (state) {
+        case S_SETUP:
+            prevAltitude = info.altitude;
+            basePressure = getPressure();
+            state = S_PRELAUNCH;
+            break;
         case S_PRELAUNCH:
+            // set path  WIDE1-1, WIDE2-2
+            if (prevAltitude - info.altitude > 10) // starts climbing
+                state = S_LOW_ALTITUDE;
             break;
         case S_LOW_ALTITUDE:
+            // set path WIDE2-1
+            if (info.altitude > LOW_HIGH_THRESHOLD) 
+                state = S_LOW_ALTITUDE;
             break;
         case S_HIGH_ALTITUDE:
+            // set path NONE
+            if (maxAltitude - info.altitude > 10) {// start falling
+                state = S_FALL;
+                // broadcast 'FALL' and max altitude
+            } else 
+                maxAltitude = max(maxAltitude, info.altitude);
             break;
         case S_FALL:
+            if (info.altitude < LOW_HIGH_THRESHOLD) 
+                state = S_PRELANDING;
             break;
         case S_PRELANDING:
+            // set path WIDE2-1
+            // broadcast more frequently
+            if (abs(prevAltitude - info.altitude) < 4 && info.speed < 1)
+                state = S_LANDING;
+            else
+                prevAltitude = info.altitude;
             break;
         case S_LANDING:
+            // set path  WIDE1-1, WIDE2-2
+            // stop recording temp and pressure
             break;
         default:
             error("Not a state");
