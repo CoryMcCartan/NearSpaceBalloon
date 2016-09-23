@@ -13,8 +13,18 @@
 
 #define INTERVAL 2000
 
+#define S_SETUP 1
+#define S_PRELAUNCH 2
+#define S_LOW_ALTITUDE 3
+#define S_HIGH_ALTITUDE 4
+#define S_FALL 5
+#define S_PRELANDING 6
+#define S_LANDING 7
+
 ProbeInfo info;
 unsigned long previous = 0;
+
+byte state = S_SETUP;
 
 // runs once at start
 void setup() {
@@ -23,11 +33,31 @@ void setup() {
     setupGPS() || error("GPS sensor setup failed.");
     setupTemperatureSensor() || error("Temperature sensor setup failed.");
     setupPressureSensor() || error("Pressure sensor setup failed.");
+
+    state = S_PRELAUNCH;
 }
 
 // runs continuously
 void loop() {
     getGPSData(&info);
+
+    switch (state) {
+        case S_PRELAUNCH:
+            break;
+        case S_LOW_ALTITUDE:
+            break;
+        case S_HIGH_ALTITUDE:
+            break;
+        case S_FALL:
+            break;
+        case S_PRELANDING:
+            break;
+        case S_LANDING:
+            break;
+        default:
+            error("Not a state");
+            break;
+    }
 
     unsigned long current = millis();
     if (current - previous >= INTERVAL) {
