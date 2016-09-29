@@ -86,7 +86,7 @@ void loop() {
             // stop recording temp and pressure
             break;
         default:
-            error("Not a state");
+            fatal_error("Not a state");
             break;
     }
 
