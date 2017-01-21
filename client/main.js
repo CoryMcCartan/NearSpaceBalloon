@@ -5,9 +5,13 @@
  */
 
 let path = require("path");
+let fs = require("fs");
 let xmlrpc = require("xmlrpc");
 let express = require("express");
 let server = express();
+let ejs = require("ejs");
+
+let parser = require("./public/js/rtty.js");
 
 // setup fldigi XML-RPC client
 let fldigi = xmlrpc.createClient({
@@ -18,6 +22,7 @@ let fldigi = xmlrpc.createClient({
 
 // store all RTTY data
 let rtty_data = "";
+rtty_data = fs.readFileSync("./public/assets/test_data.txt", "utf-8");
 
 /* 
  * Fetch new RTTY data from FL-DIGI server
@@ -74,6 +79,31 @@ server.get("/rtty/all", function(request, response) {
         getRTTY().then(() => response.send(rtty_data))
             .catch(e => response.status(500).send(e));
 });
+
+// KML data
+server.get("/kml/data.kml", function(request, response) {
+    let data = parser.processRTTY(rtty_data);  
+
+    let coords = [];
+    // add coordinates to geoJSON object
+    let length = data.time.length;
+    for (let i = 0; i < length; i++) {
+        coords.push(`${data.coords[i].lng},${data.coords[i].lat},${data.alt[i]}`);
+    }
+    let string = coords.join(" ");
+
+    fs.readFile("template.kml", "utf8", (err, template) => {
+        let kml = ejs.render(template, {
+            coordinates: string,
+        });
+
+        response.writeHead(200, {'Content-Type': 'text/xml'});
+        response.write(kml);
+        response.end();
+    })
+});
+// serve shell KML file
+server.use("/kml", express.static(path.join(__dirname, "kml")));
 
 
 // Static HTTP server

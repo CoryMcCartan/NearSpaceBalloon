@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+    <name>Transcendence</name>
+	<StyleMap id="style">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#style1</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#style0</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="style0">
+		<LineStyle>
+			<color>ffe0e0e0</color>
+			<width>4</width>
+		</LineStyle>
+	</Style>
+	<Style id="style1">
+		<LineStyle>
+			<color>ffe0e0e0</color>
+			<width>6</width>
+		</LineStyle>
+	</Style>
+    <Placemark>
+        <name>Flight Path</name>
+        <description>Probe flight path.</description>
+		<styleUrl>#style</styleUrl>
+        <LineString>
+            <altitudeMode>absolute</altitudeMode>
+            <coordinates><%=coordinates%></coordinates>
+        </LineString>
+    </Placemark>
+</Document>
+</kml>

@@ -4,6 +4,7 @@
   "description": "GSEA radio client.",
   "main": "main.js",
   "dependencies": {
+    "ejs": "^2.5.5",
     "express": "^4.14.0",
     "xmlrpc": "^1.3.2"
   },
