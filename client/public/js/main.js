@@ -6,6 +6,7 @@
  */
 
 const TESTING_MODE = true;
+let MAP = true;
 const POLLING_INTERVAL = 10; // seconds
 
 let tempChart, presChart, altChart, battChart;
@@ -25,6 +26,10 @@ async function main() {
     // show cards if successful
     $(".page-content").hidden = false;
     $("#loading").hidden = true;
+    if (!navigator.onLine) {
+        $(".map-card").hidden = true;
+        MAP = false;
+    }
     showToast("Connection established.");
 
     // parse RTTY strings
@@ -58,7 +63,7 @@ async function main() {
     });
 
     // plot path of balloon on map
-    plotPath(data.coords);
+    if (MAP) plotPath(data.coords);
 
     // set up to query new RTTY data every x seconds
     setInterval(update, POLLING_INTERVAL * 1000);
@@ -89,7 +94,7 @@ async function update() {
     addData(battChart, data.time, data.batt);
     
     // update map
-    addPathPoints(data.coords);
+    if (MAP) addPathPoints(data.coords);
 }
 
 

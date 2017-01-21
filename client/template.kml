@@ -2,36 +2,69 @@
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
 <Document>
     <name>Transcendence</name>
-	<StyleMap id="style">
+	<StyleMap id="linestyle">
 		<Pair>
 			<key>normal</key>
-			<styleUrl>#style1</styleUrl>
+			<styleUrl>#linestyle1</styleUrl>
 		</Pair>
 		<Pair>
 			<key>highlight</key>
-			<styleUrl>#style0</styleUrl>
+			<styleUrl>#linestyle1</styleUrl>
 		</Pair>
 	</StyleMap>
-	<Style id="style0">
+	<Style id="linestyle1">
 		<LineStyle>
 			<color>ffe0e0e0</color>
-			<width>4</width>
+			<width>5</width>
 		</LineStyle>
+		<PolyStyle>
+			<color>a0ffffff</color>
+			<outline>0</outline>
+		</PolyStyle>
 	</Style>
-	<Style id="style1">
-		<LineStyle>
-			<color>ffe0e0e0</color>
-			<width>6</width>
-		</LineStyle>
+	<Style id="iconstyle1">
+		<IconStyle>
+			<scale>0.9</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-blank.png</href>
+			</Icon>
+			<hotSpot x="32" y="1" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<LabelStyle>
+			<scale>0.7</scale>
+		</LabelStyle>
+		<ListStyle>
+			<ItemIcon>
+				<href>http://maps.google.com/mapfiles/kml/paddle/blu-blank-lv.png</href>
+			</ItemIcon>
+		</ListStyle>
 	</Style>
+	<StyleMap id="iconstyle">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#iconstyle1</styleUrl>
+		</Pair>
+		<Pair>
+            <styleUrl>#iconstyle1</styleUrl>
+			<key>highlight</key>
+		</Pair>
+	</StyleMap>
     <Placemark>
         <name>Flight Path</name>
-        <description>Probe flight path.</description>
-		<styleUrl>#style</styleUrl>
+		<styleUrl>#linestyle</styleUrl>
         <LineString>
+            <extrude>1</extrude>
             <altitudeMode>absolute</altitudeMode>
             <coordinates><%=coordinates%></coordinates>
         </LineString>
+    </Placemark>
+    <Placemark>
+        <name></name>
+		<styleUrl>#iconstyle</styleUrl>
+        <Point>
+            <altitudeMode>absolute</altitudeMode>
+            <coordinates><%=location%></coordinates>
+        </Point>
     </Placemark>
 </Document>
 </kml>

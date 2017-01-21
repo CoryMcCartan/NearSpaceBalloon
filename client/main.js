@@ -88,13 +88,17 @@ server.get("/kml/data.kml", function(request, response) {
     // add coordinates to geoJSON object
     let length = data.time.length;
     for (let i = 0; i < length; i++) {
-        coords.push(`${data.coords[i].lng},${data.coords[i].lat},${data.alt[i]}`);
+        let c = data.coords[i];
+        coords.push(`${c.lng},${c.lat},${data.alt[i]}`);
     }
-    let string = coords.join(" ");
+    let cString = coords.join(" ");
+    let last = data.coords[length - 1];
+    let locString = `${last.lng},${last.lat},${data.alt[length - 1]}`;
 
     fs.readFile("template.kml", "utf8", (err, template) => {
         let kml = ejs.render(template, {
-            coordinates: string,
+            coordinates: cString,
+            location: locString,
         });
 
         response.writeHead(200, {'Content-Type': 'text/xml'});
