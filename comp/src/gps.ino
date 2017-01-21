@@ -9,6 +9,7 @@
 
 #include "gps.h"
 
+// pin to enable gps
 #define ENABLE_GPS 12
 
 // parsing cases
@@ -23,7 +24,7 @@ byte buffer[82];
 bool setupGPS() {
     pinMode(ENABLE_GPS, OUTPUT);
 
-    Serial.begin(9600);
+    Serial.begin(9600); // start serial communication with GPS module
 
     digitalWrite(ENABLE_GPS, HIGH);
     delay(400);
@@ -34,6 +35,7 @@ bool setupGPS() {
 void getGPSData(ProbeInfo * info) {
     bool newData = false;
 
+    // read characters from serial stream one at a time, if available.
     while (Serial.available()) {
         char c = Serial.read();
 
@@ -63,7 +65,7 @@ void getGPSData(ProbeInfo * info) {
  * Parse NMEA GNGGA string for coordinates and # of satellites in view
  */
 void processGNGGA(ProbeInfo * info) {
-    byte intPart = 0;
+    byte decPosition = 0;
     double altitude = 0;
     double lat_min = 0;
     double lon_min = 0;
@@ -73,38 +75,42 @@ void processGNGGA(ProbeInfo * info) {
 
     // iterate over string (starting at char 7 after $GNGGA) char-by-char
     byte i, j, k;
+    // i is position within overal string
+    // j is position by comma group (each time we hit a comma, j++)
+    // k is position within comma group
     for (i = 7, j = 0, k = 0; i < index && j < 10; i++) {
         char c = buffer[i];
         // new segment
         if (c == ',') {
             j++;
             k = 0;
-            intPart = 0;
+            decPosition = 0;
             continue;
         }
 
+        // depending on position in string, we parse different variables
         switch (j) {
             case LAT:
-                if (k < 2)
+                if (k < 2) // first 2 characters of latitude are in degrees
                     parseInt(&lat_deg, c);
-                else 
-                    parseFloat(&lat_min, c, &intPart);
+                else  // rest of characters are in minutes
+                    parseFloat(&lat_min, c, &decPosition);
                 break;
             case LONG:
-                if (k < 3)
+                if (k < 3) // first 3 characters of longitude are in degrees
                     parseInt(&lon_deg, c);
-                else 
-                    parseFloat(&lon_min, c, &intPart);
+                else  // rest of characters are in minutes
+                    parseFloat(&lon_min, c, &decPosition);
                 break;
             case SAT:
                 parseInt(&satellites, c);
                 break;
             case ALT:
-                parseFloat(&altitude, c, &intPart);
+                parseFloat(&altitude, c, &decPosition);
                 break;
         }
 
-        k++;
+        k++; 
     }
 
     info->satellites = satellites;
@@ -118,22 +124,24 @@ void processGNGGA(ProbeInfo * info) {
  * Parse NMEA GNVTG string for ground speed of satellites
  */
 void processGNVTG(ProbeInfo * info) {
-    byte intPart = 0;
+    byte decPosition = 0;
     double speed = 0;
 
     // iterate over string (starting at char 7 after $GNVTG) char-by-char
     byte i, j;
+    // i is position within overal string
+    // j is position by comma group
     for (i = 7, j = 0; i < index && j < 9; i++) {
         char c = buffer[i];
         // new segment
         if (c == ',') {
             j++;
-            intPart = 0;
+            decPosition = 0;
             continue;
         }
 
         if (j == 7) {
-            parseFloat(&speed, c, &intPart);
+            parseFloat(&speed, c, &decPosition);
         }
     }
 
@@ -144,7 +152,7 @@ void processGNVTG(ProbeInfo * info) {
  * Parse NMEA GNRMC string for position and speed 
  */
 void processGNRMC(ProbeInfo * info) {
-    byte intPart = 0;
+    byte decPosition = 0;
     double speed = 0;
     double lat_min = 0;
     double lon_min = 0;
@@ -153,13 +161,16 @@ void processGNRMC(ProbeInfo * info) {
 
     // iterate over string (starting at char 7 after $GNVTG) char-by-char
     byte i, j, k;
+    // i is position within overal string
+    // j is position by comma group (each time we hit a comma, j++)
+    // k is position within comma group
     for (i = 7, j = 0, k = 0; i < index && j < 10; i++) {
         char c = buffer[i];
         // new segment
         if (c == ',') {
             j++;
             k = 0;
-            intPart = 0;
+            decPosition = 0;
             continue;
         }
 
@@ -168,16 +179,16 @@ void processGNRMC(ProbeInfo * info) {
                 if (k < 2)
                     parseInt(&lat_deg, c);
                 else 
-                    parseFloat(&lat_min, c, &intPart);
+                    parseFloat(&lat_min, c, &decPosition);
                 break;
             case 4: // LONG
                 if (k < 3)
                     parseInt(&lon_deg, c);
                 else 
-                    parseFloat(&lon_min, c, &intPart);
+                    parseFloat(&lon_min, c, &decPosition);
                 break;
             case 6: // SPEED
-                parseFloat(&speed, c, &intPart);
+                parseFloat(&speed, c, &decPosition);
                 break;
         }
         
@@ -203,21 +214,21 @@ void parseInt(byte * val, char c) {
 /**
  * Parse a character into an existing floating-point number.
  */
-void parseFloat(double * val, char c, byte * intPart) {
-    if (c >= '0' && c <= '9' && *intPart == 0) {
+void parseFloat(double * val, char c, byte * decPosition) {
+    if (c >= '0' && c <= '9' && *decPosition == 0) {
         *val *= 10;
         *val += (double) (c - '0');
     } else if (c == '.') {
-        *intPart = 1;
+        *decPosition = 1;
     } else {
         double digit = ((double) (c - '0'));
-        double power = (double) pow(10.0, (float) *intPart);
+        double power = (double) pow(10.0, (float) *decPosition);
 
         *val *= power;
         *val += digit;
         *val /= power;
 
-        (*intPart)++;
+        (*decPosition)++;
     }
 }
 
@@ -240,7 +251,7 @@ bool setDynamicModel(byte mode) {
     }
 
     for (byte i = 0; i < 5; i++) { // try at most five times
-        sendUBX(dynamic_model_command, 44); // 44 is length
+        sendUBX(dynamic_model_command, 44); // 44 is length of data
         if (getUBX_ACK(dynamic_model_command)) {
             return true;
         }

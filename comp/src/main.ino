@@ -40,18 +40,20 @@ void loop() {
 
     unsigned long current = millis();
 
+    // every INTERVAL ms, aggregate data and broadcast via radio
     if (current - previous >= INTERVAL) {
         previous = current;
 
         char msg[80];
 
-        int temp = (int) (10 * getTemperature());
-        int pres = (int) getPressure();
+        // sprintf can only print integers, so we scale data appropriately
+        int temp = (int) (10 * getTemperature()); int pres = (int) getPressure();
         long lat = (long) (10000 * info.latitude);
         long lon = (long) (10000 * info.longitude);
         int alt = (int) (10 * info.altitude);
         long bat = getVoltage();
 
+        // create a string to send
         sprintf(msg, "GSEA~S%ldT%dP%dX%ldY%ldA%dB%ld~\n", 
                 millis()/1000, 
                 temp, 

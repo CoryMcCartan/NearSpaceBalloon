@@ -14,15 +14,15 @@
     justify-content: space-between;
 }
 
-.map-card {
+/*.map-card {
     width: 96vw;
-}
+}*/
 #map {
     width: 100%;
     height: 400px;
 }
 
-#temp, #pres, #alt {
+.stat {
     font-size: 6em;
     padding: 1rem;
     line-height: 1;
@@ -39,5 +39,49 @@
 }
 
 .chart {
-    margin: 0.5em 1em 0.5em 0.5em;
+    margin: 0.5em 1.5em 0.5em 0.0em;
+}
+
+/*
+ * Screen size adjustments
+ */
+@media (min-width: 600px) and (max-width: 840px) {
+    .stat {
+        font-size: 5em;
+    }
+
+    #time {
+        font-size: 12vw;
+    }
+}
+@media (max-width: 600px) {
+    .stat {
+        font-size: 4em;
+    }
+
+    #time {
+        font-size: 20vw;
+    }
+}
+
+
+
+/*
+ * Fixes/Adjustments
+ */
+* {
+    box-sizing: border-box;
+}
+
+.mdl-layout__header-row {
+    padding: 0 40px 0 20px;
+}
+
+main {
+    background-color: #eee;
+    min-height: 100vh;
+}
+
+svg {
+    overflow: visible !important;
 }

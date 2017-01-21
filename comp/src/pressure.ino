@@ -12,11 +12,7 @@
 SFE_BMP180 pressureSensor;
 
 bool setupPressureSensor() {
-    if (pressureSensor.begin()) {
-        return true;
-    } else {
-        return false;
-    }
+    return pressureSensor.begin();
 }
 
 double getPressure() {

@@ -11,7 +11,9 @@
 #include "radio.h"
 #include "pin.h"
 
-#define CRC16 0x1021
+// special checksum constant
+#define CRC16 0x1021 
+
 char datastring[80];
 
 // Private function definitions
@@ -20,16 +22,13 @@ void sendBit(byte bit);
 short calculateChecksum(char * str);
 
 void send_rtty_string(char * str) {
-    //ptt(true);
-
+    // a few padding 0s
     sendByte(0);
     sendByte(0);
     sendByte(0);
     
     for (char * c = str; *c != '\0'; c++) 
         sendByte(*c);
-
-    //ptt(false);
 }
 
 void sendByte(byte b) {
@@ -41,7 +40,7 @@ void sendByte(byte b) {
         else
             sendBit(0);
 
-        b = b >> 1; // next bit
+        b = b >> 1; // line up next bit
 
     }
 

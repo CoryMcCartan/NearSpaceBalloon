@@ -1,3 +1,12 @@
+/*
+ * Chart and plotting functions.
+ */
+
+
+/*
+ * Draws a line chart, provided with a parent element and a configuration object
+ * containing data.  Returns chart object.
+ */
 function drawLineChart(el, config) {
     return c3.generate({
         bindto: el,
@@ -45,6 +54,9 @@ function drawLineChart(el, config) {
     });
 }
 
+/*
+ * Add data to an existing chart.
+ */
 function addData(chart, time, data) {
     chart.flow({
         columns: [

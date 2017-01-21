@@ -1,6 +1,7 @@
 /**
  * Service Worker for offline use.
  */
+
 var log = false;
 
 var CACHE_VERSION = "v1.0";

@@ -8,16 +8,16 @@
 
     <link rel="icon" type="image/png" href="assets/favicon.png">
 
+    <!-- CSS -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300">
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.red-blue.min.css">
+    <link rel="stylesheet" href="css/material.min.css">
+    <link rel="stylesheet" href="css/c3.min.css">
     
-    <link rel="stylesheet" href="css/fixes.css">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="js/lib/c3.min.css">
 </head>
 <body>
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header"> <!--mdl-layout--fixed-drawer ->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
         <!-- Header -->
         <header class="mdl-layout__header mdl-color--red-600">
             <div class="mdl-layout__header-row">
@@ -30,28 +30,6 @@
                 <div class="mdl-layout-spacer"></div>
             </div>
         </header>
-        <!-- Drawer 
-        <div class="mdl-layout__drawer mdl-color--grey-900 mdl-color-text--grey-50">
-            <span class="mdl-layout-title">&nbsp;</span>
-            <nav class="mdl-navigation">
-                <a class="mdl-navigation__link" href="#">
-                    <i class="material-icons">home</i>
-                    Overview
-                </a>
-                <a class="mdl-navigation__link" href="#">
-                    <i class="material-icons">map</i>
-                    Map
-                </a>
-                <a class="mdl-navigation__link" href="#">
-                    <i class="material-icons">timeline</i>
-                    Log
-                </a>
-                <a class="mdl-navigation__link" href="#">
-                    <i class="material-icons">settings</i>
-                    Settings
-                </a>
-            </nav>
-        </div>-->
 
         <main class="mdl-layout__content">
             <!-- 'Loading' spinner -->
@@ -83,7 +61,7 @@
                         <i class="material-icons">terrain</i>&nbsp;
                         <h2 class="mdl-card__title-text">Altitude</h2>
                     </div>
-                    <div id="alt">40m</div>
+                    <div id="alt" class="stat">40m</div>
                     <div id="alt-graph" class="chart"></div>
                 </div>
 
@@ -93,7 +71,7 @@
                         <i class="material-icons">ac_unit</i>&nbsp;
                         <h2 class="mdl-card__title-text">Temperature</h2>
                     </div>
-                    <div id="temp">-12 °F</div>
+                    <div id="temp" class="stat">-12 °F</div>
                     <div id="temp-graph" class="chart"></div>
                 </div>
 
@@ -103,7 +81,7 @@
                         <i class="material-icons">wb_cloudy</i>&nbsp;
                         <h2 class="mdl-card__title-text">Pressure</h2>
                     </div>
-                    <div id="pres">855 mb</div>
+                    <div id="pres" class="stat">855 mb</div>
                     <div id="pres-graph" class="chart"></div>
                 </div>
             </div>
@@ -114,12 +92,17 @@
             <button class="mdl-snackbar__action" type="button"></button>
         </div>
     </div>
-    <script src="https://d3js.org/d3.v3.min.js"></script>
-    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-    <script src="https://corymccartan.github.io/jslib/lib.min.js"></script>
+
+    <!-- JS -->
+    <script src="js/lib/d3.min.js"></script>
+    <script defer src="js/lib/material.min.js"></script>
+    <script src="js/lib/lib.min.js"></script>
     <script src="js/lib/c3.min.js"></script>
+
     <script src="js/charts.js"></script>
+    <script src="js/maps.js"></script>
     <script src="js/main.js"></script>
+
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBRposL5olwt-Th2tFkouzidiKigIKx3hM&callback=initMap">
         </script>
 </body>
