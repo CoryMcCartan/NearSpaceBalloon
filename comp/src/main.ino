@@ -12,8 +12,8 @@
 #include "radio.h"
 #include "gps.h"
 #include "battery.h"
-//#include "aprs.h"
-#include "rtty.h"
+#include "aprs.h"
+//#include "rtty.h"
 
 #define INTERVAL 10000 // how often to send radio signals
 
@@ -29,10 +29,10 @@ void setup() {
     ptt(true);
 }
 
-// void loop() {
-//     send_packet(getTemperature(), getPressure());
-//     delay(1000);
-// }
+//void loop() {
+//    send_packet(getTemperature(), getPressure());
+//    delay(1000);
+//}
 
 // runs continuously
 void loop() {
@@ -54,7 +54,7 @@ void loop() {
         long bat = getVoltage();
 
         // create a string to send
-        sprintf(msg, "GSEA~S%ldT%dP%dX%ldY%ldA%dB%ld~\n", 
+        sprintf(msg, "KG5LCD~S%ldT%dP%dX%ldY%ldA%dB%ld~\n", 
                 millis()/1000, 
                 temp, 
                 pres,

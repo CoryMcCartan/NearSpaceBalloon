@@ -17,7 +17,7 @@ function processRTTY(text) {
     
     for (let entry of entries) {
         // regex to extract numbers
-        let matches = entry.match(/GSEA~S(\d+)T(\d+)P(\d+)X(\d+)Y(\d+)A(\d+)B(\d+)~/);        
+        let matches = entry.match(/KG5LCD~S(\d+)T(\d+)P(\d+)X(\d+)Y(\d+)A(\d+)B(\d+)~/);        
         // skip invalid entries
         if (matches === null) continue;
 
